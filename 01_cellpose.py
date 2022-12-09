@@ -1,3 +1,5 @@
+# Adapted from https://github.com/MouseLand/cellpose
+
 # !nvcc --version
 # !nvidia-smi
 
@@ -13,7 +15,6 @@ use_GPU = core.use_gpu()
 yn = ['NO', 'YES']
 print(f'>>> GPU activated? {yn[use_GPU]}')
 
-
 dir = './example/raw/'
 movies = glob(dir + '*.tiff')
 
@@ -21,12 +22,12 @@ for movie in movies:
     well_name = os.path.basename(movie)[:-5]
     savedir = './example/segmentation/'
     model_path = './example/models/cellpose_residual_on_style_on_concatenation_off_01_2022_09_02_13_36_37.924639'
-    diameter=15
+    model_path = './example/models/neutrophils'
+    diameter=14
     chan=0
     chan2=0
     flow_threshold = 0.4
     cellprob_threshold=0
-
 
     reader_image_stack = AICSImage(movie)
     image_stack = reader_image_stack.get_image_data("ZYX")
@@ -51,6 +52,5 @@ for movie in movies:
                                       cellprob_threshold=cellprob_threshold
                                       )
 
-    
     masks_3d = np.vstack(np.expand_dims(masks, axis=0))
     OmeTiffWriter.save(masks_3d, savedir + well_name + '.tiff', dim_order="ZYX")

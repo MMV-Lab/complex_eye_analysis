@@ -135,8 +135,7 @@ for movie in movies:
         traj[tt-1].update({"child": prev_child})
         traj[tt].update({"parent": next_parent})
         traj[tt].update({"ID": next_ID})
-        traj[tt].update({"track_pts": next_track_pts})
-    import pdb; pdb.set_trace()    
+        traj[tt].update({"track_pts": next_track_pts})  
     np.save(save_path_tracks + well_name + '_dict.npy', [traj, lineage])
 
     # get right format for napari tracks layer
@@ -144,12 +143,9 @@ for movie in movies:
     tracks_layer = np.append(tracks_layer, [0])
     tracks_layer = np.append(tracks_layer, [traj[0]['ID'][0]])
     tracks_layer=tracks_layer[[3,2,0,1]]
-
-
     tracks_layer = np.expand_dims(tracks_layer, axis=1)
     tracks_layer = tracks_layer.T
     
-
     for i in range(len(traj[0]['ID'])-1):
         track = np.round(np.asarray(traj[0]['centroid'][i+1]))
         track = np.append(track, [0])
@@ -158,7 +154,6 @@ for movie in movies:
         track = np.expand_dims(track, axis=1)
         track = track.T
         tracks_layer = np.concatenate((tracks_layer, track), axis=0)
-
 
     for i in range(len(traj)-1):                                                    # all images    
         for cell_ID in range(len(traj[i+1]['ID'])):
@@ -169,8 +164,8 @@ for movie in movies:
             track = np.expand_dims(track, axis=1)
             track = track.T
             tracks_layer = np.concatenate((tracks_layer, track), axis=0)   
-    
+
     df = pd.DataFrame(tracks_layer, columns=['ID', 'Z', 'Y', 'X'])
     df.sort_values(['ID', 'Z'], ascending=True, inplace=True)
     tracks_formated = df.values
-    np.save(save_path_tracks + well_name + '.npy', tracks_formated)
+    np.save(save_path_tracks + well_name + '_trackslayer.npy', tracks_formated)
