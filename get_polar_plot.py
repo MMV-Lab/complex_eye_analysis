@@ -1,3 +1,5 @@
+# Adapted from https://github.com/MMV-Lab/complex_eye_analysis
+
 import numpy as np
 import math
 import matplotlib.pyplot as plt

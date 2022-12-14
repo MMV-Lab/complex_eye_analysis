@@ -21,7 +21,6 @@ movies = glob(dir + '*.tiff')
 for movie in movies:
     well_name = os.path.basename(movie)[:-5]
     savedir = './example/segmentation/'
-    model_path = './example/models/cellpose_residual_on_style_on_concatenation_off_01_2022_09_02_13_36_37.924639'
     model_path = './example/models/neutrophils'
     diameter=14
     chan=0
