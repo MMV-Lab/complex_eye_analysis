@@ -4,15 +4,15 @@
 This is the Python code related to the manuscript "ComplexEye - a multi lens array microscope for High-Throughput embedded immune cell migration analysis". Our code has been tested on Linux, but since Cellpose is also supported for Windows and Mac OS, our code should work on these platforms as well.
 
 ## Installation
-We recommend following the instructions provided within the [Cellpose repo](https://github.com/MouseLand/cellpose) and then executing 
-`
+We recommend following the instructions provided within the [Cellpose repo](https://github.com/MouseLand/cellpose) and then executing: 
+~~~
 pip install aicsimageio matplotlib scikit-image
-`.
+~~~
 
-Alternatively, install the provided Anaconda environment with
-`
+Alternatively, install the provided Anaconda environment with:
+~~~
 conda env create -f environment.yml
-`.
+~~~
 
 The entire installation should not take more than a few minutes.
 ## Example
