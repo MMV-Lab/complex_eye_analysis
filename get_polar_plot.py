@@ -1,4 +1,4 @@
-# Adapted from https://github.com/MMV-Lab/complex_eye_analysis
+# Adapted from https://github.com/MMV-Lab/cell_movie_analysis
 
 import numpy as np
 import math
@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pdb
 import os
 
-movies = os.listdir('./example/tracks/')
+movies = os.listdir('./data/tracks/')
 
 
 for movie in movies:
@@ -17,7 +17,7 @@ for movie in movies:
     ax = fig.add_subplot(111, projection='polar')
     #ax.set_ylim([0,600])
 
-    traj = np.load('./example/tracks/' + movie, allow_pickle=True)
+    traj = np.load('./data/tracks/' + movie, allow_pickle=True)
     lineage = traj[1]
 
     for _, single_trace in lineage.items():
@@ -35,4 +35,4 @@ for movie in movies:
             pass
 
         ax.plot(v_theta, v_r)
-    plt.savefig('./example/results/polar_plots/' + movie.replace('_dict.npy','.png'), bbox_inches='tight')
+    plt.savefig('./results/polar_plots/' + movie.replace('_dict.npy','.png'), bbox_inches='tight')

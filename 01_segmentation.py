@@ -15,13 +15,13 @@ use_GPU = core.use_gpu()
 yn = ['NO', 'YES']
 print(f'>>> GPU activated? {yn[use_GPU]}')
 
-dir = './example/raw/'
+dir = './data/raw/'
 movies = glob(dir + '*.tiff')
 
 for movie in movies:
     well_name = os.path.basename(movie)[:-5]
-    savedir = './example/segmentation/'
-    model_path = './example/models/neutrophils'
+    savedir = './data/segmentation/'
+    model_path = './models/neutrophils'
     diameter=14
     chan=0
     chan2=0
