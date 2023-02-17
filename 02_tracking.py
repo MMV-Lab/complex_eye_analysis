@@ -1,12 +1,16 @@
-# ADAPTED FROM https://github.com/MMV-Lab/cell_movie_analysis/blob/main/run_tracking.py
+# Adapted from https://github.com/MMV-Lab/cell_movie_analysis
 
 import os
 import numpy as np
 from scipy import optimize, spatial, ndimage
 from aicsimageio import AICSImage
+from aicsimageio.writers import OmeTiffWriter
 import numpy as np
 import os
 import pandas as pd
+from utils import random_colormap
+from skimage.segmentation import find_boundaries
+from skimage.draw import line
 
 
 # params
@@ -16,29 +20,32 @@ track_display_length = 20
 min_obj_size = 20
 
 
-path_to_movies = './example/segmentation/'
-save_path_tracks = './example/tracks/'
+path_to_movies = './data/segmentation/'
+save_path_tracks = './data/tracks/'
 movies= os.listdir(path_to_movies)
 
 for movie in movies:
-    reader = AICSImage(path_to_movies+movie)
-    img = reader.get_image_data("ZYX")
-    if img.shape[0] < 2:
-        img = reader.get_image_data("TYX")
+    seg_reader = AICSImage(path_to_movies+movie)
+    seg = seg_reader.get_image_data("ZYX")
+    if seg.shape[0] < 2:
+        seg = seg_reader.get_image_data("TYX")
+
     ##### paths ######
     well_name = movie[:-5]
     traj = dict()
     lineage = dict()
+
     ##### tracking loop ####
-    total_time = img.shape[0]
+    total_time = seg.shape[0]
     for tt in range(total_time):
-        seg = img[tt,:,:]
+        seg_frame = seg[tt,:,:]
+
         # get label image
-        _, num_cells = ndimage.label(seg)
-        seg_label = seg
+        _, num_cells = ndimage.label(seg_frame)
+
         # calculate center of mass
-        centroid = ndimage.center_of_mass(seg, labels=seg, index=np.arange(1, num_cells + 1))     # sometimes returns nans, TBD why ?? => propably fixed
-        ## remove nans                                                                                   # this can probably be deleted
+        centroid = ndimage.center_of_mass(seg_frame, labels=seg_frame, index=np.arange(1, num_cells + 1))     # sometimes returns nans => propably fixed
+        ## remove nans                                                                                        # this can probably be deleted
         # list_to_remove = []                  
         # for index in range(len(centroid)):
         #     if np.isnan(centroid[index][0]):
@@ -46,10 +53,12 @@ for movie in movies:
         #         import pdb; pdb.set_trace()
         #         print("nan in frame " + str(tt) + " of movie " + well_name)
         # centroid = [i for j, i in enumerate(centroid) if j not in list_to_remove]
+
         # generate cell information of this frame
         traj.update({
             tt : {"centroid": centroid, "parent": [], "child": [], "ID": []}
         })
+
     # initialize trajectory ID, parent node, track pts for the first frame
     max_cell_id =  len(traj[0].get("centroid"))
     traj[0].update(
@@ -67,6 +76,7 @@ for movie in movies:
     for tt in np.arange(1, total_time):
         p_prev = traj[tt-1].get("centroid")
         p_next = traj[tt].get("centroid")
+
         ###########################################################
         # simple LAP tracking
         ###########################################################
@@ -91,6 +101,7 @@ for movie in movies:
             print(well_name + ' terminated at frame ' + str(tt))
             break   
         row_ind, col_ind = optimize.linear_sum_assignment(cost_mat_aug)
+
         #########################################################
         # parse the matching result
         #########################################################
@@ -98,17 +109,20 @@ for movie in movies:
         next_parent = np.ones(num_cell_next, dtype=int)
         next_ID = np.zeros(num_cell_next, dtype=int)
         next_track_pts = []
+
         # assign child for cells in previous frame
         for ii in range(num_cell_prev):
             if col_ind[ii] >= num_cell_next:
                 prev_child[ii] = -1
             else:
                 prev_child[ii] = col_ind[ii]
+
         # assign parent for cells in next frame, update ID and track pts
         prev_pt = traj[tt-1].get("track_pts")
         prev_id = traj[tt-1].get("ID")
         for ii in range(num_cell_next):
             if ii in col_ind:
+
                 # a matched cell is found
                 next_parent[ii] = np.where(col_ind == ii)[0][0]
                 next_ID[ii] = prev_id[next_parent[ii]]
@@ -117,6 +131,7 @@ for movie in movies:
                 if len(current_pts) > track_display_length:
                     current_pts.pop(0)
                 next_track_pts.append(current_pts)
+
                 # attach this point to the lineage
                 single_lineage = lineage.get(next_ID[ii])
                 try:
@@ -125,12 +140,14 @@ for movie in movies:
                     pdb.set_trace()
                 lineage.update({next_ID[ii]: single_lineage})
             else:
+
                 # a new cell
                 next_parent[ii] = -1
                 next_ID[ii] = max_cell_id
                 next_track_pts.append([p_next[ii]])
                 lineage.update({max_cell_id: [p_next[ii]]})
                 max_cell_id += 1
+
         # update record
         traj[tt-1].update({"child": prev_child})
         traj[tt].update({"parent": next_parent})
@@ -142,7 +159,7 @@ for movie in movies:
     tracks_layer = np.round(np.asarray(traj[0]['centroid'][0])) 
     tracks_layer = np.append(tracks_layer, [0])
     tracks_layer = np.append(tracks_layer, [traj[0]['ID'][0]])
-    tracks_layer=tracks_layer[[3,2,0,1]]
+    tracks_layer = tracks_layer[[3,2,0,1]]
     tracks_layer = np.expand_dims(tracks_layer, axis=1)
     tracks_layer = tracks_layer.T
     
@@ -169,3 +186,68 @@ for movie in movies:
     df.sort_values(['ID', 'Z'], ascending=True, inplace=True)
     tracks_formated = df.values
     np.save(save_path_tracks + well_name + '_trackslayer.npy', tracks_formated)
+
+
+    ######################################################
+    # generate track visualization
+    ######################################################
+    cmap = random_colormap()
+    raw_reader = AICSImage(path_to_movies.replace('segmentation', 'raw') + movie)
+    raw = raw_reader.get_image_data("ZYX")
+    for tt in range(total_time):
+
+        # load segmentation and extract contours
+        seg_frame = seg[tt,:,:]
+        num_cells = len(np.unique(seg_frame))-1 # background is not a cell #seg_frame, num_cells = ndimage.label(seg_frame)
+        cell_contours = find_boundaries(seg_frame, mode='inner').astype(np.uint16)
+        cell_contours[cell_contours > 0] = 1
+        cell_contours = cell_contours * seg_frame.astype(np.uint16)
+        cell_contours = cell_contours - 1  # to make the first object has label 0, to match index
+
+        # load raw image and create visualizaiton in RGB
+        # TODO: use real raw images
+        raw_frame = raw[tt,:,:]
+        raw_frame = (raw_frame - raw_frame.min())/ (raw_frame.max() - raw_frame.min())
+        raw_frame = raw_frame * 255
+        raw_frame = raw_frame.astype(np.uint8)
+        vis = np.zeros((raw_frame.shape[0], raw_frame.shape[1], 3), dtype=np.uint8)
+        for cc in range(3):
+            vis[:, :, cc] = raw_frame
+
+        # loop through all cells, for each cell, we do the following
+        # 1- find ID, 2- load the color, 3- draw contour 4- draw track
+        cell_id = traj[tt].get("ID")
+        pts = traj[tt].get("track_pts")
+
+        for cid in range(num_cells):
+            # find ID
+            this_id = cell_id[cid]
+
+            # load the color
+            this_color = 255 * cmap.colors[this_id]
+            this_color = this_color.astype(np.uint8)
+
+            # draw contour
+            for cc in range(3):
+                vis_c = vis[:, :, cc]
+                vis_c[cell_contours == cid] = this_color[cc]
+                vis[:, :, cc] = vis_c  # TODO: check if we need this line
+
+            # draw track
+            this_track = pts[cid]
+            if len(this_track) < 2:
+                continue
+            else:
+                for pid in range(len(this_track) - 1):
+                    p1 = this_track[pid]
+                    p2 = this_track[pid + 1]
+                    rr, cc = line(int(round(p1[0])), int(round(p1[1])), int(round(p2[0])), int(round(p2[1])))
+                    for ch in range(3):
+                        vis[rr, cc ,ch] = this_color[ch]
+        if tt==0:
+            vis_all = vis
+        elif tt==1:
+            vis_all = np.stack((vis_all, vis))    
+        else:
+            vis_all = np.concatenate((vis_all, np.expand_dims(vis, axis=0)))                    
+    OmeTiffWriter.save(vis_all, save_path_tracks + movie, dim_order="ZYXS")    

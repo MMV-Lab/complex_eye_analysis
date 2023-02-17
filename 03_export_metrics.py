@@ -6,7 +6,7 @@ from aicsimageio import AICSImage
 from metrics import filter_tracks, calculate_speed
 
 
-movies = os.listdir('./example/segmentation/')
+movies = os.listdir('./data/segmentation/')
 
 ### microscop settings
 microscopic_resolution = 1.56                       # sqrt(pix)/micrometer
@@ -50,8 +50,8 @@ microscopic_resolutions.append('microscopic resolution [sqrt(pix)/µm]')
 
 ### get metrics 
 for movie in movies:
-    tracks = np.load('./example/tracks/' + movie.replace('.tiff', '') + '_trackslayer.npy').astype(int)    
-    reader_segmentation = AICSImage('./example/segmentation/' + movie)
+    tracks = np.load('./data/tracks/' + movie.replace('.tiff', '') + '_trackslayer.npy').astype(int)    
+    reader_segmentation = AICSImage('./data/segmentation/' + movie)
     segmentation = reader_segmentation.get_image_data("ZYX")
     if segmentation.shape[0] < 2:
         segmentation = reader_segmentation.get_image_data("TYX")    
@@ -80,5 +80,5 @@ for movie in movies:
 
 ### export    
 df = pd.DataFrame(zip(wells, total_tracks, total_cells, moving_cells, moving_cells_perc, mean_speed, std_speed, min_track_dur, movement_thresh, min_track_to_be_cell, microscopic_resolutions, frame_periods))
-df.to_csv('./example/results/metrics.csv', index=False, header=False)
+df.to_csv('./results/metrics.csv', index=False, header=False)
 
