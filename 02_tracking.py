@@ -45,14 +45,7 @@ for movie in movies:
 
         # calculate center of mass
         centroid = ndimage.center_of_mass(seg_frame, labels=seg_frame, index=np.arange(1, num_cells + 1))     # sometimes returns nans => propably fixed
-        ## remove nans                                                                                        # this can probably be deleted
-        # list_to_remove = []                  
-        # for index in range(len(centroid)):
-        #     if np.isnan(centroid[index][0]):
-        #         list_to_remove.append(index)
-        #         import pdb; pdb.set_trace()
-        #         print("nan in frame " + str(tt) + " of movie " + well_name)
-        # centroid = [i for j, i in enumerate(centroid) if j not in list_to_remove]
+
 
         # generate cell information of this frame
         traj.update({
