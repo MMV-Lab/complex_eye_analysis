@@ -1,84 +1,92 @@
 name: complex_eye_analysis
 channels:
-  - pytorch
+  - conda-forge
   - defaults
+  - pytorch
 dependencies:
-  - _libgcc_mutex=0.1=main
-  - _openmp_mutex=5.1=1_gnu
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
   - blas=1.0=mkl
-  - ca-certificates=2023.01.10=h06a4308_0
+  - bzip2=1.0.8=h7f98852_4
+  - ca-certificates=2022.5.18=ha878542_0
   - certifi=2022.12.7=py38h06a4308_0
   - cudatoolkit=11.3.1=h2bc3f7f_2
-  - flit-core=3.6.0=pyhd3eb1b0_0
-  - intel-openmp=2022.1.0=h9e868ea_3769
-  - ld_impl_linux-64=2.38=h1181459_1
-  - libffi=3.4.2=h6a678d5_6
-  - libgcc-ng=11.2.0=h1234567_1
-  - libgomp=11.2.0=h1234567_1
-  - libstdcxx-ng=11.2.0=h1234567_1
-  - mkl=2022.1.0=hc2b9512_224
-  - ncurses=6.4=h6a678d5_0
-  - openssl=1.1.1t=h7f8727e_0
-  - pip=22.3.1=py38h06a4308_0
-  - python=3.8.16=h7a1cb2a_2
-  - pytorch=1.12.0=py3.8_cuda11.3_cudnn8.3.2_0
+  - flit-core=3.7.1=pyhd8ed1ab_0
+  - intel-openmp=2022.0.1=h06a4308_3633
+  - ld_impl_linux-64=2.36.1=hea4e1c9_2
+  - libffi=3.4.2=h7f98852_5
+  - libgcc-ng=11.2.0=h1d223b6_16
+  - libgomp=11.2.0=h1d223b6_16
+  - libnsl=2.0.0=h7f98852_0
+  - libstdcxx-ng=11.2.0=he4da1e4_16
+  - libuuid=2.32.1=h7f98852_1000
+  - libuv=1.43.0=h7f98852_0
+  - libzlib=1.2.11=h166bdaf_1014
+  - mkl=2022.0.1=h06a4308_117
+  - ncurses=6.3=h27087fc_1
+  - openssl=1.1.1o=h166bdaf_0
+  - pip=22.0.4=pyhd8ed1ab_0
+  - python=3.8.13=h582c2e5_0_cpython
+  - pytorch=1.11.0=py3.8_cuda11.3_cudnn8.2.0_0
   - pytorch-mutex=1.0=cuda
-  - readline=8.2=h5eee18b_0
+  - readline=8.1=h46c0cb4_0
   - setuptools=65.6.3=py38h06a4308_0
-  - sqlite=3.40.1=h5082296_0
-  - tk=8.6.12=h1ccaba5_0
-  - wheel=0.37.1=pyhd3eb1b0_0
-  - xz=5.2.10=h5eee18b_1
-  - zlib=1.2.13=h5eee18b_0
+  - sqlite=3.38.3=h4ff8645_0
+  - tk=8.6.12=h27826a3_0
+  - wheel=0.37.1=pyhd8ed1ab_0
+  - xz=5.2.5=h516909a_1
+  - zlib=1.2.11=h166bdaf_1014
   - pip:
     - aicsimageio==4.9.4
     - asciitree==0.3.3
-    - cellpose==2.2
+    - cellpose==2.2.2
+    - charset-normalizer==3.1.0
     - click==8.1.3
-    - cloudpickle==2.2.1
+    - cloudpickle==2.2.0
     - contourpy==1.0.7
     - cycler==0.11.0
-    - dask==2023.2.0
-    - dnspython==2.3.0
-    - elementpath==4.0.1
-    - email-validator==1.3.1
+    - dask==2022.12.0
+    - dnspython==2.2.1
+    - elementpath==3.0.2
+    - email-validator==1.3.0
     - entrypoints==0.4
+    - et-xmlfile==1.1.0
     - fasteners==0.18
     - fastremap==1.13.4
-    - fonttools==4.38.0
-    - fsspec==2023.1.0
-    - idna==3.4
-    - imagecodecs==2023.1.23
-    - imageio==2.25.1
-    - importlib-metadata==6.0.0
-    - importlib-resources==5.10.2
-    - kiwisolver==1.4.4
-    - llvmlite==0.39.1
+    - fonttools==4.33.3
+    - fsspec==2022.5.0
+    - idna==3.3
+    - imagecodecs==2022.2.22
+    - imageio==2.30.0
+    - kiwisolver==1.4.2
+    - llvmlite==0.38.0
     - locket==1.0.0
-    - lxml==4.9.2
-    - matplotlib==3.7.0
-    - natsort==8.2.0
-    - networkx==3.0
-    - numba==0.56.4
-    - numcodecs==0.11.0
-    - numpy==1.23.5
-    - nvidia-cublas-cu11==11.10.3.66
-    - nvidia-cuda-nvrtc-cu11==11.7.99
-    - nvidia-cuda-runtime-cu11==11.7.99
-    - nvidia-cudnn-cu11==8.5.0.96
-    - ome-types==0.3.3
-    - opencv-python-headless==4.7.0.68
-    - packaging==23.0
-    - pandas==1.5.3
+    - lxml==4.9.1
+    - matplotlib==3.5.2
+    - natsort==8.1.0
+    - networkx==3.1
+    - numba==0.55.1
+    - numcodecs==0.10.2
+    - numpy==1.21.6
+    - oauthlib==3.2.2
+    - ome-types==0.3.2
+    - opencv-python-headless==4.2.0.34
+    - openpyxl==3.1.2
+    - packaging==23.1
+    - pandas==1.5.2
     - partd==1.3.0
-    - pillow==9.4.0
+    - pillow==9.1.0
     - pint==0.20.1
     - pydantic==1.10.5
     - pyparsing==3.0.9
-    - pytz==2022.7.1
+    - python-dateutil==2.8.2
+    - pytz==2022.6
     - pywavelets==1.4.1
     - pyyaml==6.0
+    - requests==2.31.0
+    - requests-oauthlib==1.3.1
     - resource-backed-dask-array==0.1.0
+    - roifile==2023.5.12
     - scikit-image==0.19.3
     - scipy==1.10.0
     - six==1.16.0
@@ -86,8 +94,9 @@ dependencies:
     - toolz==0.12.0
     - tqdm==4.64.1
     - typing-extensions==4.5.0
+    - urllib3==2.0.2
     - wrapt==1.14.1
     - xarray==2023.1.0
-    - xmlschema==2.2.1
+    - xmlschema==2.1.1
     - zarr==2.14.1
     - zipp==3.13.0
