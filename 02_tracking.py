@@ -41,10 +41,20 @@ for movie in movies:
     for tt in range(total_time):
         seg_frame = seg[tt, :, :]
 
+        _, num_cells = ndimage.label(seg_frame)
+
         # calculate center of mass
         centroid = ndimage.center_of_mass(
-            seg_frame, labels=seg_frame, index=np.unique(seg_frame)[1:]
+            seg_frame, labels=seg_frame, index=np.arange(1, num_cells + 1)
         )
+
+        #remove nans
+        list_to_remove = []                  
+        for index in range(len(centroid)):
+            if np.isnan(centroid[index][0]):
+                list_to_remove.append(index)
+                print("nan in frame " + str(tt) + " of movie " + well_name)
+        centroid = [i for j, i in enumerate(centroid) if j not in list_to_remove]
 
         # generate cell information of this frame
         traj.update({tt: {"centroid": centroid, "parent": [], "child": [], "ID": []}})
