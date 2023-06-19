@@ -2,16 +2,17 @@
 
 import os
 import numpy as np
+import pandas as pd
+import pdb
+
 from scipy import optimize, spatial, ndimage
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
-import numpy as np
-import os
-import pandas as pd
-import pdb
-from utils import random_colormap
 from skimage.segmentation import find_boundaries
 from skimage.draw import line
+
+from utils import random_colormap
+
 
 
 # params
