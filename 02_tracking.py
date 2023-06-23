@@ -14,7 +14,6 @@ from skimage.draw import line
 from utils import random_colormap
 
 
-
 # params
 max_matching_dist = 45
 approx_inf = 65535
