@@ -30,6 +30,8 @@ for movie in movies:
 
     reader_image_stack = AICSImage(movie)
     image_stack = reader_image_stack.get_image_data("ZYX")
+    if image_stack.shape[0] == 1:
+        image_stack = reader_image_stack.get_image_data("TYX")    
     images = []
     for i in range(image_stack.shape[0]):
         images.append(image_stack[i])
