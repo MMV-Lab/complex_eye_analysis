@@ -4,7 +4,7 @@ import numpy as np
 ### define average speed
 def calculate_speed(tracks):
     speeds = []
-    for unique_id in tracks[:, 0]:
+    for unique_id in np.unique(tracks[:, 0]):
         track = np.delete(tracks, np.where(tracks[:, 0] != unique_id), 0)
         for i in range(0, len(track) - 1):
             speeds.append(
