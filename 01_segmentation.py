@@ -29,16 +29,16 @@ for movie in movies:
     cellprob_threshold = 0
 
     reader_image_stack = AICSImage(movie)
-    image_stack = reader_image_stack.get_image_data("ZYX")
+    if reader_image_stack.dims.T > 1:
+        image_stack = reader_image_stack.get_image_data("TYX")
+    else: 
+        image_stack = reader_image_stack.get_image_data("ZYX")
     images = []
     for i in range(image_stack.shape[0]):
         images.append(image_stack[i])
 
     # declare model
     model = models.CellposeModel(gpu=True, pretrained_model=model_path)
-
-    # use model diameter if user diameter is 0
-    diameter = model.diam_labels if diameter == 0 else diameter
 
     # run model on test images
     masks, flows, styles = model.eval(
