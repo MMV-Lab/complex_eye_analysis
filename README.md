@@ -1,7 +1,7 @@
 # complex_eye_analysis
 
 ## Introduction
-This is the Python code related to the manuscript "ComplexEye - a multi lens array microscope for High-Throughput embedded immune cell migration analysis". Our code has only been tested on Ubuntu 20.04.5 LTS, but since Cellpose is also supported for Windows and Mac OS, our code should work on these platforms as well.
+This is the Python code related to the manuscript [ComplexEye - a multi lens array microscope for High-Throughput embedded immune cell migration analysis](https://doi.org/10.1038/s41467-023-43765-3). Our code has only been tested on Ubuntu 20.04.5 LTS, but since Cellpose is also supported for Windows and Mac OS, our code should work on these platforms as well.
 
 We will continuously update and optimize our code. To reproduce the results of the manuscript, we refer to the branch [paper_version](https://github.com/MMV-Lab/complex_eye_analysis/tree/paper_version).
 

@@ -9,20 +9,20 @@ from cellpose import core, models
 from glob import glob
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
+from pathlib import Path
 
 
 use_GPU = core.use_gpu()
 yn = ["NO", "YES"]
 print(f">>> GPU activated? {yn[use_GPU]}")
 
-dir = "./data/raw/"
-movies = glob(dir + "*.tiff")
+dir = Path('data','raw')
+movies = dir.glob()
 
 for movie in movies:
-    well_name = os.path.basename(movie)[:-5]
-    savedir = "./data/segmentation/"
-    model_path = "./models/model_neutrophils"
-    diameter = 15
+    well_name = movie.stem
+    savedir = Path('data', 'segmentation')
+    model_path = Path('models', 'model_neutrophils')
     chan = 0
     chan2 = 0
     flow_threshold = 0.4
@@ -44,10 +44,9 @@ for movie in movies:
     masks, flows, styles = model.eval(
         images,
         channels=[chan, chan2],
-        diameter=diameter,
         flow_threshold=flow_threshold,
         cellprob_threshold=cellprob_threshold,
     )
 
     masks_3d = np.vstack(np.expand_dims(masks, axis=0))
-    OmeTiffWriter.save(masks_3d, savedir + well_name + ".tiff", dim_order="ZYX")
+    OmeTiffWriter.save(masks_3d, Path(savedir, well_name + ".tiff"), dim_order="TYX")

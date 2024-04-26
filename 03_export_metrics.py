@@ -4,9 +4,11 @@ import pandas as pd
 from aicsimageio import AICSImage
 #from glob import glob
 from metrics import filter_tracks, calculate_speed
+from pathlib import Path
 
 
-movies = os.listdir('./data/segmentation/')
+#movies = os.listdir('./data/segmentation/')
+movies = Path('./data/segmentation').glob('*.tiff')
 
 ### microscop settings
 microscopic_resolution = 1.56                       # sqrt(pix)/micrometer
@@ -50,11 +52,12 @@ microscopic_resolutions.append('microscopic resolution [sqrt(pix)/µm]')
 
 ### get metrics 
 for movie in movies:
-    tracks = np.load('./data/tracks/' + movie.replace('.tiff', '') + '_trackslayer.npy').astype(int)    
-    reader_segmentation = AICSImage('./data/segmentation/' + movie)
-    segmentation = reader_segmentation.get_image_data("ZYX")
-    if segmentation.shape[0] < 2:
-        segmentation = reader_segmentation.get_image_data("TYX")    
+    tracks = np.load('./data/tracks/' + movie.stem + '_trackslayer.npy').astype(int)    
+    reader_segmentation = AICSImage(Path('data', 'segmentation', + movie.name))
+    if reader_segmentation.dims.T > 1:
+        segmentation = reader_segmentation.get_image_data("TYX")
+    else:
+        segmentation = reader_segmentation.get_image_data("ZYX")
     
     filtered_tracks = filter_tracks(tracks, movement_threshold, min_track_duration)
     min_track_dur.append(min_track_duration*frameperiod)
@@ -73,7 +76,7 @@ for movie in movies:
     moving_cells.append(amount_moving_cells)
     moving_cells_perc.append(np.round(amount_moving_cells/amount_total_cells*100,3))
     
-    wells.append(movie.replace('.npy', ''))    
+    wells.append(movie.stem)    
     min_track_to_be_cell.append(min_track_duration_to_be_considered_as_a_cell*frameperiod)
     frame_periods.append(frameperiod)
     microscopic_resolutions.append(microscopic_resolution)
