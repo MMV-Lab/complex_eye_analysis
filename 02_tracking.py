@@ -14,6 +14,7 @@ from skimage.segmentation import find_boundaries
 from skimage.draw import line
 from pathlib import Path
 
+get_track_visualization = False # set to True to generate track visualization as .tiff file
 
 # params
 max_matching_dist = 45
@@ -22,13 +23,13 @@ track_display_length = 20
 min_obj_size = 20
 
 
-path_to_movies = Path('data', 'segmentation')
+path_to_movies = Path('data', 'raw')
 save_path_tracks = Path('data', 'tracks')
-movies = path_to_movies.glob()
+movies = path_to_movies.glob('*')
 
 for movie in movies:
-    seg_reader = AICSImage(movie)
-    if seg.reader.dims.T > 1:
+    seg_reader = AICSImage('data/segmentation/' + movie.with_suffix('.tiff').name)
+    if seg_reader.dims.T > 1:
         seg = seg_reader.get_image_data("TYX")
     else:
         seg = seg_reader.get_image_data("ZYX")
@@ -144,7 +145,7 @@ for movie in movies:
         traj[tt].update({"parent": next_parent})
         traj[tt].update({"ID": next_ID})
         traj[tt].update({"track_pts": next_track_pts})
-    np.save(save_path_tracks + well_name + "_dict.npy", [traj, lineage])
+    np.save(Path(save_path_tracks, well_name + "_dict.npy"), [traj, lineage])
 
     # get right format for napari tracks layer
     tracks_layer = np.round(np.asarray(traj[0]["centroid"][0]))
@@ -176,72 +177,77 @@ for movie in movies:
     df = pd.DataFrame(tracks_layer, columns=["ID", "T", "Y", "X"])
     df.sort_values(["ID", "T"], ascending=True, inplace=True)
     tracks_formated = df.values
-    np.save(save_path_tracks + well_name + "_trackslayer.npy", tracks_formated)
+    np.save(Path(save_path_tracks, well_name + "_trackslayer.npy"), tracks_formated)
 
     # ######################################################
     # # generate track visualization
     # ######################################################
-    # cmap = random_colormap()
-    # raw_reader = AICSImage(path_to_movies.replace("segmentation", "raw") + movie)
-    # raw = raw_reader.get_image_data("ZYX")
-    # for tt in range(total_time):
-    #     # extract contours
-    #     seg_frame = seg[tt, :, :]
-    #     cell_contours = find_boundaries(seg_frame, mode="inner").astype(np.uint16)
-    #     cell_contours[cell_contours > 0] = 1
-    #     cell_contours = cell_contours * seg_frame.astype(np.uint16)
-    #     cell_contours = (
-    #         cell_contours - 1
-    #     )  # to make the first object has label 0, to match index
 
-    #     # create visualizaiton in RGB
-    #     raw_frame = raw[tt, :, :]
-    #     raw_frame = (raw_frame - raw_frame.min()) / (raw_frame.max() - raw_frame.min())
-    #     raw_frame = raw_frame * 255
-    #     raw_frame = raw_frame.astype(np.uint8)
-    #     vis = np.zeros((raw_frame.shape[0], raw_frame.shape[1], 3), dtype=np.uint8)
-    #     for cc in range(3):
-    #         vis[:, :, cc] = raw_frame
-
-    #     # loop through all cells, for each cell, we do the following
-    #     # 1- find ID, 2- load the color, 3- draw contour 4- draw track
-    #     cell_id = traj[tt].get("ID")
-    #     pts = traj[tt].get("track_pts")
-
-    #     for cid in range(len(cell_id)):
-    #         # find ID
-    #         this_id = cell_id[cid]
-
-    #         # load the color
-    #         this_color = 255 * cmap.colors[this_id]
-    #         this_color = this_color.astype(np.uint8)
-
-    #         # draw contour
-    #         for cc in range(3):
-    #             vis_c = vis[:, :, cc]
-    #             vis_c[cell_contours == cid] = this_color[cc]
-    #             vis[:, :, cc] = vis_c  # TODO: check if we need this line
-
-    #         # draw track
-    #         this_track = pts[cid]
-    #         if len(this_track) < 2:
-    #             continue
-    #         else:
-    #             for pid in range(len(this_track) - 1):
-    #                 p1 = this_track[pid]
-    #                 p2 = this_track[pid + 1]
-    #                 rr, cc = line(
-    #                     int(round(p1[0])),
-    #                     int(round(p1[1])),
-    #                     int(round(p2[0])),
-    #                     int(round(p2[1])),
-    #                 )
-    #                 for ch in range(3):
-    #                     vis[rr, cc, ch] = this_color[ch]
-    #     if tt == 0:
-    #         vis_all = vis
-    #     elif tt == 1:
-    #         vis_all = np.stack((vis_all, vis))
-    #     else:
-    #         vis_all = np.concatenate((vis_all, np.expand_dims(vis, axis=0)))
-    # OmeTiffWriter.save(vis_all, save_path_tracks + movie.name, dim_order="TYXS")
+    if get_track_visualization:
+        cmap = random_colormap()
+        raw_reader = AICSImage(movie)
+        if raw_reader.dims.T > 1:
+            raw = raw_reader.get_image_data("TYX")
+        else:
+            raw = raw_reader.get_image_data("ZYX")
+        for tt in range(total_time):
+            # extract contours
+            seg_frame = seg[tt, :, :]
+            cell_contours = find_boundaries(seg_frame, mode="inner").astype(np.uint16)
+            cell_contours[cell_contours > 0] = 1
+            cell_contours = cell_contours * seg_frame.astype(np.uint16)
+            cell_contours = (
+                cell_contours - 1
+            )  # to make the first object has label 0, to match index
+    # 
+            # create visualizaiton in RGB
+            raw_frame = raw[tt, :, :]
+            raw_frame = (raw_frame - raw_frame.min()) / (raw_frame.max() - raw_frame.min())
+            raw_frame = raw_frame * 255
+            raw_frame = raw_frame.astype(np.uint8)
+            vis = np.zeros((raw_frame.shape[0], raw_frame.shape[1], 3), dtype=np.uint8)
+            for cc in range(3):
+                vis[:, :, cc] = raw_frame
+    # 
+            # loop through all cells, for each cell, we do the following
+            # 1- find ID, 2- load the color, 3- draw contour 4- draw track
+            cell_id = traj[tt].get("ID")
+            pts = traj[tt].get("track_pts")
+    # 
+            for cid in range(len(cell_id)):
+                # find ID
+                this_id = cell_id[cid]
+    # 
+                # load the color
+                this_color = 255 * cmap.colors[this_id]
+                this_color = this_color.astype(np.uint8)
+    # 
+                # draw contour
+                for cc in range(3):
+                    vis_c = vis[:, :, cc]
+                    vis_c[cell_contours == cid] = this_color[cc]
+                    vis[:, :, cc] = vis_c  # TODO: check if we need this line
+    # 
+                # draw track
+                this_track = pts[cid]
+                if len(this_track) < 2:
+                    continue
+                else:
+                    for pid in range(len(this_track) - 1):
+                        p1 = this_track[pid]
+                        p2 = this_track[pid + 1]
+                        rr, cc = line(
+                            int(round(p1[0])),
+                            int(round(p1[1])),
+                            int(round(p2[0])),
+                            int(round(p2[1])),
+                        )
+                        for ch in range(3):
+                            vis[rr, cc, ch] = this_color[ch]
+            if tt == 0:
+                vis_all = vis
+            elif tt == 1:
+                vis_all = np.stack((vis_all, vis))
+            else:
+                vis_all = np.concatenate((vis_all, np.expand_dims(vis, axis=0)))
+        OmeTiffWriter.save(vis_all, Path(save_path_tracks, movie.with_suffix('.tiff').name), dim_order="TYXS")

@@ -17,12 +17,19 @@ yn = ["NO", "YES"]
 print(f">>> GPU activated? {yn[use_GPU]}")
 
 dir = Path('data','raw')
-movies = dir.glob()
+
+supported_extensions = ['*.mp4', '*.tif', '*.avi', '*.tiff']
+movies = []
+for ext in supported_extensions:
+    movies.extend(dir.glob(ext))
+
+# movies = dir.glob('*')
 
 for movie in movies:
     well_name = movie.stem
     savedir = Path('data', 'segmentation')
-    model_path = Path('models', 'model_neutrophils')
+    model_path = glob("models/*")[0] # use first model in folder
+    # model_path = 'models/model_neutrophils' # set specific model
     chan = 0
     chan2 = 0
     flow_threshold = 0.4

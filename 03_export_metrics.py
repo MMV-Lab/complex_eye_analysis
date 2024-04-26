@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 #movies = os.listdir('./data/segmentation/')
-movies = Path('./data/segmentation').glob('*.tiff')
+movies = Path('./data/raw').glob('*')
 
 ### microscop settings
 microscopic_resolution = 1.56                       # sqrt(pix)/micrometer
@@ -52,8 +52,9 @@ microscopic_resolutions.append('microscopic resolution [sqrt(pix)/µm]')
 
 ### get metrics 
 for movie in movies:
-    tracks = np.load('./data/tracks/' + movie.stem + '_trackslayer.npy').astype(int)    
-    reader_segmentation = AICSImage(Path('data', 'segmentation', + movie.name))
+    #import pdb; pdb.set_trace()
+    tracks = np.load(Path('./data/tracks/', str(movie.stem) + '_trackslayer.npy')).astype(int)    
+    reader_segmentation = AICSImage(Path('data', 'segmentation', movie.with_suffix('.tiff').name))
     if reader_segmentation.dims.T > 1:
         segmentation = reader_segmentation.get_image_data("TYX")
     else:
