@@ -38,8 +38,8 @@ for movie in movies:
     
     for unique_id in np.unique(filtered_tracks[:,0]):
         track_ids.append(unique_id)
+        track = np.delete(filtered_tracks,np.where(filtered_tracks[:,0] != unique_id),0)        
         track_duration.append(len(track))
-        track = np.delete(filtered_tracks,np.where(filtered_tracks[:,0] != unique_id),0)
         
         speed = calculate_speed_single_cell(track)
         mean_speed.append(speed[0])
