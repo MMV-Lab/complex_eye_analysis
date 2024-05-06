@@ -1,9 +1,5 @@
 # Adapted from https://github.com/MouseLand/cellpose
 
-# !nvcc --version
-# !nvidia-smi
-
-import os
 import numpy as np
 from cellpose import core, models
 from glob import glob
@@ -48,12 +44,15 @@ for movie in movies:
     model = models.CellposeModel(gpu=True, pretrained_model=model_path)
 
     # run model on test images
-    masks, flows, styles = model.eval(
-        images,
-        channels=[chan, chan2],
-        flow_threshold=flow_threshold,
-        cellprob_threshold=cellprob_threshold,
-    )
-
+    masks = []
+    for image in images:
+        mask, _, _ = model.eval(
+            image,
+            channels=[chan, chan2],
+            flow_threshold=flow_threshold,
+            cellprob_threshold=cellprob_threshold,
+        )
+        masks.append(mask)
+    
     masks_3d = np.vstack(np.expand_dims(masks, axis=0))
     OmeTiffWriter.save(masks_3d, Path(savedir, well_name + ".tiff"), dim_order="TYX")
