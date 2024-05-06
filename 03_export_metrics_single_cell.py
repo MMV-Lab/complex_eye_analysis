@@ -7,6 +7,7 @@ from metrics import filter_tracks, calculate_speed_single_cell
 from pathlib import Path
 
 movies = Path('./data/raw').glob('*')
+Path('./results/single_cell_metrics').mkdir(parents=True, exist_ok=True)
 
 ### filter params
 movement_threshold = 0                             # in sqrt(pix)
