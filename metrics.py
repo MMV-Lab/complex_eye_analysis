@@ -21,8 +21,6 @@ def calculate_speed_single_cell(track):
 def get_euclidean_distances(tracks): # calculates euclidean distances for all cells
     distances = []
     for unique_id in np.unique(tracks[:,0]):
-        # if unique_id == 65:
-        #     import pdb; pdb.set_trace()
         track = np.delete(tracks,np.where(tracks[:,0] != unique_id),0)
         x = track[-1,3] - track[0,3]
         y = track[0,2] - track[-1,2]
@@ -95,6 +93,18 @@ def calculate_size(tracks, segmentation):
                 centroid_outside_cell = True
                 continue
             sizes.append(len(np.where(segmentation[track[i,1]] == seg_id)[0]))    
+    return (np.around(np.average(sizes),3), np.around(np.std(sizes),3)), centroid_outside_cell
+
+def calculate_size_single_cell(track, segmentation):
+    sizes = []
+    centroid_outside_cell = False
+    assert len(np.unique(track[:,0])) == 1, "Only one track is allowed!"
+    for i in range(0,len(track)-1):
+        seg_id = segmentation[track[i,1],track[i,2],track[i,3]]
+        if seg_id == 0:
+            centroid_outside_cell = True
+            continue
+        sizes.append(len(np.where(segmentation[track[i,1]] == seg_id)[0]))    
     return (np.around(np.average(sizes),3), np.around(np.std(sizes),3)), centroid_outside_cell
 
 
