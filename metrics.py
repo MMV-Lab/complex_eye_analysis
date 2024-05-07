@@ -109,8 +109,7 @@ def calculate_size_single_cell(track, segmentation):
 
 
 def calculate_euclidean_over_threshold(tracks, move_thresh):    # checks whether the Euclidean distance is above the threshold at least once
-    movement_mask = [] #np.asarray([])
-    #movement_mask = np.ndarray((tracks.shape[0],2))
+    movement_mask = [] 
     for track_id in np.unique(tracks[:,0]):
         track = tracks[np.where(tracks[:,0]==track_id)]
         for frame_2 in range(1,len(track)):
