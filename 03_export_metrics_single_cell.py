@@ -54,4 +54,4 @@ for movie in tqdm(movies):
     ### export
 
     df = pd.DataFrame(zip(track_ids, track_duration, mean_speed, std_speed, mean_size, std_size))
-    df.to_excel('./results/single_cell_metrics/' + movie.stem + '.xlsx', index=False, header=False)
+    df.to_csv('./results/single_cell_metrics/' + movie.stem + '.csv', index=False, header=False)
