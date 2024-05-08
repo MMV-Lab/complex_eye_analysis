@@ -26,7 +26,7 @@ path_to_movies = Path('data', 'raw')
 save_path_tracks = Path('data', 'tracks')
 movies = path_to_movies.glob('*')
 
-for movie in tqdm(movies:)
+for movie in tqdm(movies):
     seg_reader = AICSImage('data/segmentation/' + movie.with_suffix('.tiff').name)
     if seg_reader.dims.T > 1:
         seg = seg_reader.get_image_data("TYX")
