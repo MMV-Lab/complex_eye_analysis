@@ -1,18 +1,17 @@
 # Adapted from https://github.com/MMV-Lab/cell_movie_analysis
 
-import os
 import numpy as np
 from scipy import optimize, spatial, ndimage
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
 import numpy as np
-import os
 import pandas as pd
 import pdb
 from utils import random_colormap
 from skimage.segmentation import find_boundaries
 from skimage.draw import line
 from pathlib import Path
+from tqdm import tqdm
 
 get_track_visualization = False # set to True to generate track visualization as .tiff file
 
@@ -27,7 +26,7 @@ path_to_movies = Path('data', 'raw')
 save_path_tracks = Path('data', 'tracks')
 movies = path_to_movies.glob('*')
 
-for movie in movies:
+for movie in tqdm(movies:)
     seg_reader = AICSImage('data/segmentation/' + movie.with_suffix('.tiff').name)
     if seg_reader.dims.T > 1:
         seg = seg_reader.get_image_data("TYX")

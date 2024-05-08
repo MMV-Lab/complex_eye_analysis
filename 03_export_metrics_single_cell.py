@@ -1,10 +1,9 @@
 import numpy as np
-import os
 import pandas as pd
 from aicsimageio import AICSImage
-#from glob import glob
 from metrics import filter_tracks, calculate_speed_single_cell, calculate_size_single_cell
 from pathlib import Path
+from tqdm import tqdm
 
 movies = Path('./data/raw').glob('*')
 Path('./results/single_cell_metrics').mkdir(parents=True, exist_ok=True)
@@ -15,7 +14,7 @@ min_track_duration = 0                              # in frames, should be minim
 
 
 ### get metrics 
-for movie in movies:
+for movie in tqdm(movies):
     mean_speed = []
     std_speed = []
     track_ids = []

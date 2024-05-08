@@ -1,13 +1,10 @@
 import numpy as np
-import os
 import pandas as pd
 from aicsimageio import AICSImage
-#from glob import glob
 from metrics import filter_tracks, calculate_speed
 from pathlib import Path
+from tqdm import tqdm
 
-
-#movies = os.listdir('./data/segmentation/')
 movies = Path('./data/raw').glob('*')
 
 ### microscop settings
@@ -51,8 +48,7 @@ microscopic_resolutions = []
 microscopic_resolutions.append('microscopic resolution [sqrt(pix)/µm]')
 
 ### get metrics 
-for movie in movies:
-    #import pdb; pdb.set_trace()
+for movie in tqdm(movies):
     tracks = np.load(Path('./data/tracks/', str(movie.stem) + '_trackslayer.npy')).astype(int)    
     reader_segmentation = AICSImage(Path('data', 'segmentation', movie.with_suffix('.tiff').name))
     if reader_segmentation.dims.T > 1:

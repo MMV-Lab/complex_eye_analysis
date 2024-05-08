@@ -6,6 +6,7 @@ from glob import glob
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
 from pathlib import Path
+from tqdm import tqdm
 
 
 use_GPU = core.use_gpu()
@@ -21,7 +22,7 @@ for ext in supported_extensions:
 
 # movies = dir.glob('*')
 
-for movie in movies:
+for movie in tqdm(movies):
     well_name = movie.stem
     savedir = Path('data', 'segmentation')
     model_path = glob("models/*")[0] # use first model in folder
