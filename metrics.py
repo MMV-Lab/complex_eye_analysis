@@ -99,7 +99,7 @@ def calculate_size_single_cell(track, segmentation):
     sizes = []
     centroid_outside_cell = False
     assert len(np.unique(track[:,0])) == 1, "Only one track is allowed!"
-    for i in range(0,len(track)-1):
+    for i in range(0,len(track)):
         seg_id = segmentation[track[i,1],track[i,2],track[i,3]]
         if seg_id == 0:
             centroid_outside_cell = True
