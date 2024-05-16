@@ -9,6 +9,13 @@ def calculate_speed(tracks):
             speeds.append(np.hypot(track[i,2] - track[i+1,2],track[i,3] - track[i+1,3]))
     return np.around(np.average(speeds),3), np.around(np.std(speeds),3)
 
+def calculate_speed_single_cell(track):
+    speeds = []
+    assert len(np.unique(track[:,0])) == 1, "Only one track is allowed!"
+    for i in range(0,len(track)-1):
+        speeds.append(np.hypot(track[i,2] - track[i+1,2],track[i,3] - track[i+1,3]))
+    return np.around(np.average(speeds),3), np.around(np.std(speeds),3)
+
 
 ### calculate euclidean distances
 def get_euclidean_distances(tracks): # calculates euclidean distances for all cells
@@ -88,17 +95,31 @@ def calculate_size(tracks, segmentation):
             sizes.append(len(np.where(segmentation[track[i,1]] == seg_id)[0]))    
     return (np.around(np.average(sizes),3), np.around(np.std(sizes),3)), centroid_outside_cell
 
+def calculate_size_single_cell(track, segmentation):
+    sizes = []
+    centroid_outside_cell = False
+    assert len(np.unique(track[:,0])) == 1, "Only one track is allowed!"
+    for i in range(0,len(track)):
+        seg_id = segmentation[track[i,1],track[i,2],track[i,3]]
+        if seg_id == 0:
+            centroid_outside_cell = True
+            continue
+        sizes.append(len(np.where(segmentation[track[i,1]] == seg_id)[0]))    
+    return (np.around(np.average(sizes),3), np.around(np.std(sizes),3)), centroid_outside_cell
 
-def calculate_euclidean_over_threshold(tracks, move_thresh):
-    movement_mask = [] #np.asarray([])
-    #movement_mask = np.ndarray((tracks.shape[0],2))
+
+def calculate_euclidean_over_threshold(tracks, move_thresh):    # checks whether the Euclidean distance is above the threshold at least once
+    movement_mask = [] 
     for track_id in np.unique(tracks[:,0]):
         track = tracks[np.where(tracks[:,0]==track_id)]
         for frame_2 in range(1,len(track)):
             if get_euclidean_distances(track[0:frame_2])[1] > move_thresh:
-                #np.append(movement_mask,track_id)
                 movement_mask.append(track_id)
                 break
+            if len(track) == 2:
+                if get_euclidean_distances(track)[1] > move_thresh:
+                    movement_mask.append(track_id)
+                    break
     return movement_mask
 
 
@@ -106,10 +127,7 @@ def filter_tracks(tracks,move_thresh, min_track):
     duration_mask = np.unique(tracks[:,0])[np.where(np.unique(tracks[:,0],return_counts=True)[1] >= min_track)]
     #accumulated_distance = get_accumulated_distances(tracks)
     #movement_mask = np.ndarray.astype(accumulated_distance[np.where(accumulated_distance[:,1] >= move_thresh)][:,0],int)
-    #euclidean_distance = get_euclidean_distances(tracks)
-    #movement_mask = np.ndarray.astype(euclidean_distance[np.where(euclidean_distance[:,1] >= move_thresh)][:,0], int)
-    movement_mask = calculate_euclidean_over_threshold(tracks, move_thresh)
-    #import pdb; pdb.set_trace()
+    movement_mask = calculate_euclidean_over_threshold(tracks, move_thresh) # filter based on euclidean distance and len(track) >= 2 
     combined_mask = np.intersect1d(movement_mask,duration_mask)
     tracks = np.asarray([tracks[i] for i in range(0,len(tracks)) if tracks[i,0] in combined_mask])
     return tracks    

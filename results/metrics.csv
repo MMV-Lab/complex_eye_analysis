@@ -1,2 +1,2 @@
 well,total_tracks,total_cells,moving_cells,moving_cells_perc [%],speed_mean [µm/min],speed_std [µm/min],min_track_duration [s],movement_threshold [µm],track_threshold_for_cells [s],microscopic resolution [sqrt(pix)/µm],frame_period [s/frame]
-example.tiff,7,7,6,85.714,24.764423076923077,10.706730769230768,64,7.69,40,1.56,8
+example,7,7,7,100.0,23.509615384615383,10.139423076923077,64,7.69,40,1.56,8
